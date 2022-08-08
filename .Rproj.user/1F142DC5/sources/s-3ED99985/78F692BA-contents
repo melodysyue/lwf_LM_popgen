@@ -1,0 +1,36 @@
+library(tidyverse)
+
+rm(list=ls())
+
+
+#all snps
+snps <- read.table("./data/plink/lwf.pop.bim", header=F)
+snps <- snps %>% 
+  select(chr=V1, pos=V4, snp=V2)
+
+#pcadapt outliers
+pcadapt <- read.table("./data/neutral_outlier/lwf.ol.qval0.01.snps", header=T)
+
+
+#rda outliers
+rda <- read.table("./data/env/lwf.rda.snp.candidates.txt", header=T)
+
+
+#shared between pcadpat and rda
+
+table(pcadapt$x %in% rda$snp)
+
+#ol = pcadapt or rda
+
+ol <- c(as.character(pcadapt$x), as.character(rda$snp)) %>% 
+  unique()
+
+#neutral
+
+neutral <- snps %>% 
+  filter(!snp %in% ol) %>% 
+  pull(snp) %>% 
+  as.character()
+
+write.table(ol, "./data/neutral_outlier/lwf.ol.snps", quote=F, row.names = F)
+write.table(neutral, "./data/neutral_outlier/lwf.neutral.snps", quote=F, row.names = F)

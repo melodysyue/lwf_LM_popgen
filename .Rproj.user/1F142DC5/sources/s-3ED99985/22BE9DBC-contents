@@ -1,0 +1,109 @@
+library(tidyverse)
+library(raster)
+library(factoextra)
+library(patchwork)
+library(gridExtra)
+library(cowplot)
+
+rm(list=ls())
+
+#19 Bioclimatic variables
+#the data are available at 4 different spatial resolutions: 0.5, 2.5, 5 and 10 mins. Here we use 2.5 min
+#env.data <- getData('worldclim', var='bio', res=2.5) 
+env.data <- getData('worldclim', res=2.5, var='bio', path=".", download=FALSE)
+geo <- read.csv("./data/meta/collections_lat_longs_afterfiltering_corrected.csv", header=T)
+head(geo)
+
+coords <- geo %>% 
+  dplyr::select(x=long, y=lat) #long first, then lat. 
+
+head(coords)
+
+geo_env <- extract(env.data,coords) 
+head(geo_env)
+
+
+pop.env <- geo_env
+rownames(pop.env) <- geo$code
+head(pop.env)
+
+write.table(pop.env, "./data/env/19bioclim_pop.txt", quote=F, row.names = T)
+
+pop.env <- read.table("./data/env/19bioclim_pop.txt", header=T)
+
+pca.r <- prcomp(pop.env, scale=TRUE, center=TRUE)
+str(pca.r)
+
+#variance explained
+ev <- pca.r$sdev^2
+ev[1] / sum(ev)
+ev[2] / sum(ev)
+
+
+p_pca <- fviz_pca_biplot(pca.r,  #This reference line corresponds to the expected value if the contribution where uniform.
+                axes=c(1,2),
+                col.ind = "dodgerblue",# Individuals color
+                col.var = "dimgray", # Variables color
+                pointsize=4,
+                repel=TRUE,
+                labelsize=6)+ 
+  labs(title="", x=paste0("PC1 (", round((ev[1] / sum(ev)), 3)*100, "%)"), y=paste0("PC2 (", round((ev[2] / sum(ev)), 3)*100, "%)"))+
+  theme_bw(base_size = 15)
+
+
+#see how many PCs to retain
+#Kaiser-Guttman criterion and broken stick;
+
+# Broken stick model (MacArthur 1957)
+n = length(ev)
+bsm = data.frame(j=seq(1:n), p=0)
+bsm$p[1] = 1/n
+for (i in 2:n) bsm$p[i] = bsm$p[i-1] + (1/(n + 1 - i))
+bsm$p = 100*bsm$p/n
+# Plot eigenvalues and % of variation for each axis
+
+pdf(NULL)
+dev.control(displaylist="enable")
+op = par(mfrow=c(2,1),omi=c(0.1,0.3,0.1,0.1), mar=c(1, 1, 1, 1))
+barplot(ev, main="Kaiser-Guttman criterion", col="bisque", las=2)
+abline(h=mean(ev), col="red")
+legend("topright", "Average eigenvalue", lwd=1, col=2, bty="n")
+barplot(t(cbind(100*ev/sum(ev), bsm$p[n:1])), beside=TRUE, 
+        main="Broken stick model", col=c("bisque",2), las=2)
+legend("topright", c("% eigenvalue", "Broken stick model"), 
+       pch=15, col=c("bisque",2), bty="n")
+par(op)
+
+p_criteria <- recordPlot()
+invisible(dev.off())
+
+p_criteria
+p_criteria <- as_grob(p_criteria)
+
+
+
+#contribution to each significant PC
+p_pc1 <- fviz_contrib(pca.r, choice = "var",axes=1)+coord_flip()+
+  labs(title = "Contribution to PC1", x="")+
+  theme_bw(base_size=15)
+
+
+p_pc2 <- fviz_contrib(pca.r, choice = "var",axes=2)+coord_flip()+
+  labs(title = "Contribution to PC2", x="")+
+  theme_bw(base_size=15)
+
+
+#plot
+
+pdf("./figures/figS7_envPC.pdf", width = 12, height = 18)
+p_pca / wrap_elements(p_criteria) / (p_pc1 + p_pc2) + 
+  plot_layout(heights = c(2,2,3))+
+  plot_annotation(tag_levels = "A")
+
+dev.off()
+
+#extract environmental PCs
+pca.r$x[,1:2]
+write.table(pca.r$x[,1:2], "./data/env/lwf_env_PC12_pop.txt", quote=F, row.names = T)
+
+

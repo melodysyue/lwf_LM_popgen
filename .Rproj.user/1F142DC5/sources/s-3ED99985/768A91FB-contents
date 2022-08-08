@@ -1,0 +1,147 @@
+library(tidyverse)
+library(pafr)
+library(patchwork)
+
+rm(list=ls())
+
+
+#read alignment file, it might take a while
+ali1 <- read_paf("./genome_alignment/AWG2_ASM2_aln.paf")
+str(ali1)
+
+#filter by primary alignments, mapping quality and target chrs
+summary(ali1$mapq)
+
+ali1.p <- filter_secondary_alignments(ali1)
+ali1.pm <- subset(ali1.p, mapq>=30)
+
+
+ali1.pm %>% 
+  as.data.frame() %>% 
+  filter(tname=="LR778271.1") %>% 
+  group_by(qname) %>% 
+  summarize(n=n()) %>% 
+  arrange(desc(n)) %>% 
+  view()
+
+
+#chr7: 5-5.8Mb
+chr7 <- list(
+  c("NC_059198.1"),
+  c("LR778259.1")
+)
+
+
+chr7_start=4965516
+chr7_end=5757557
+
+dotplot(ali1.pm, label_seqs=TRUE, order_by="provided", ordering=chr7)+
+  theme_bw(base_size=25)
+
+p7 <- dotplot(ali1.pm, label_seqs=TRUE, order_by="provided", ordering=chr7, 
+              xlab="NC_059198.1", 
+              ylab="LR778259.1")+
+  theme_bw(base_size=25)+
+  coord_cartesian(xlim=c(60e6, 62e6),ylim=c(4.5e6, 6.5e6))+
+  annotate("rect",ymin=chr7_start, ymax=chr7_end, xmin=-Inf, xmax=Inf, fill="purple", alpha=0.2)+
+  ggtitle("Chromosome 7")
+
+#chr10:15.4-16.7.8Mb
+chr10 <- list(
+  c("NC_059201.1"),
+  c("LR778262.1")
+)
+
+
+chr10_start=15395264
+chr10_end=16706802
+
+dotplot(ali1.pm, label_seqs=TRUE, order_by="provided", ordering=chr10)+
+  theme_bw(base_size=25)
+
+p10 <- dotplot(ali1.pm, label_seqs=TRUE, order_by="provided", ordering=chr10, 
+               xlab="NC_059201.1", 
+               ylab="LR778262.1")+
+  theme_bw(base_size=25)+
+  coord_cartesian(xlim=c(33.5e6, 35.5e6), ylim=c(14.5e6, 17.5e6))+
+  annotate("rect",ymin=chr10_start, ymax=chr10_end, xmin=-Inf, xmax=Inf, fill="purple", alpha=0.2)+
+  ggtitle("Chromosome 10")
+
+
+#chr12: 39.9-40.5 Mb
+chr12 <- list(
+  c("NC_059203.1"),
+  c("LR778264.1")
+)
+
+
+chr12_start=39866383
+chr12_end=40459975
+
+dotplot(ali1.pm, label_seqs=TRUE, order_by="provided", ordering=chr12)+
+  theme_bw(base_size=25)
+
+p12 <- dotplot(ali1.pm, label_seqs=TRUE, order_by="provided", ordering=chr12, 
+               xlab="NC_059203.1", 
+               ylab="LR778264.1")+
+  theme_bw(base_size=25)+
+  coord_cartesian(xlim=c(28e6, 30e6),ylim=c(39e6, 41e6))+
+  annotate("rect",ymin=chr12_start, ymax=chr12_end, xmin=-Inf, xmax=Inf, fill="purple", alpha=0.2)+
+  ggtitle("Chromosome 12")
+
+p12
+
+
+#chr18: 30-30.8 MB
+chr18 <- list(
+  c("NC_059209.1"),
+  c("LR778270.1")
+)
+
+
+chr18_start=30003782
+chr18_end=30782027
+
+dotplot(ali1.pm, label_seqs=TRUE, order_by="provided", ordering=chr18)+
+  theme_bw(base_size=25)
+
+p18 <- dotplot(ali1.pm, label_seqs=TRUE, order_by="provided", ordering=chr18, 
+               xlab="NC_059209.1", 
+               ylab="LR778270.1")+
+  theme_bw(base_size=25)+
+  coord_cartesian(xlim=c(25e6, 27e6), ylim=c(29.5e6, 31.5e6))+
+  annotate("rect",ymin=chr18_start, ymax=chr18_end, xmin=-Inf, xmax=Inf, fill="purple", alpha=0.2)+
+  ggtitle("Chromosome 18")
+
+
+#chr19: 30.4-31 MB
+chr19 <- list(
+  c("NC_059210.1"),
+  c("LR778271.1")
+)
+
+
+chr19_start=30399638
+chr19_end=31036381
+
+dotplot(ali1.pm, label_seqs=TRUE, order_by="provided", ordering=chr19)+
+  theme_bw(base_size=25)
+
+p19 <- dotplot(ali1.pm, label_seqs=TRUE, order_by="provided", ordering=chr19, 
+               xlab="NC_059210.1", 
+               ylab="LR778271.1")+
+  theme_bw(base_size=25)+
+  coord_cartesian(xlim=c(40e6, 42e6),ylim=c(30e6, 32e6))+
+  annotate("rect",ymin=chr19_start, ymax=chr19_end, xmin=-Inf, xmax=Inf, fill="purple", alpha=0.2)+
+  ggtitle("Chromosome 19")
+
+
+pdf("AWG2_vs_ASM2_aln.pdf", width = 18, height = 12)
+p7+p10+p12+p18+p19+
+  plot_annotation(
+    title="Genome alignment between lake whitefish (GCF_020615455.1) \n and European Alpine whitefish (GCA_902810595.1)"
+  )&
+  theme(plot.title = element_text(size=25, hjust=0.5))
+
+dev.off()
+

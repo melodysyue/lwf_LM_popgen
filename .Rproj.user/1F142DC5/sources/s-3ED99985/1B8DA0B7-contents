@@ -1,0 +1,114 @@
+library(tidyverse)
+library(pafr)
+library(patchwork)
+
+rm(list=ls())
+
+
+#read alignment file, it might take a while
+ali1 <- read_paf("./alignments/ogor_oner_aln.paf")
+str(ali1) 
+
+#filter by primary alignments, mapping quality and target chrs
+summary(ali1$mapq)
+ali1.p <- filter_secondary_alignments(ali1)
+summary(ali1$mapq)
+ali1.pm <- subset(ali1.p, mapq>=60)
+
+
+#chr3, region 33345646 - 33483020
+chr3 <- list(
+  c("NC_042537.1"),
+  c("CM037757.1")
+)
+
+chr3_start=33345646
+chr3_end=33483020
+
+dotplot(ali1.pm, label_seqs=TRUE, order_by="provided", ordering=chr3)+
+  theme_bw(base_size=25)+
+  coord_cartesian(xlim=c(32e6, 34e6), ylim=c(56e6, 59e6))
+
+p3 <- dotplot(ali1.pm, label_seqs=TRUE, order_by="provided", ordering=chr3)+
+  theme_bw(base_size=25)+
+  coord_cartesian(xlim=c(32e6, 34e6), ylim=c(56e6, 59e6))+
+  annotate("rect",xmin=chr3_start, xmax=chr3_end, ymin=-Inf, ymax=Inf, fill="purple", alpha=0.2)+
+  ggtitle("Chromosome 3")+
+  theme(axis.title.x = element_blank())
+
+
+#chr5, region 26913332- 27004275
+chr5 <- list(
+  c("NC_042539.1"),
+  c("CM037771.1")
+)
+
+chr5_start=26913332
+chr5_end=27004275
+
+dotplot(ali1.pm, label_seqs=TRUE, order_by="provided", ordering=chr5)+
+  theme_bw(base_size=25)+
+  coord_cartesian(xlim=c(26e6, 28e6), ylim=c(51e6, 54e6))
+
+p5 <- dotplot(ali1.pm, label_seqs=TRUE, order_by="provided", ordering=chr5)+
+  theme_bw(base_size=25)+
+  coord_cartesian(xlim=c(26e6, 28e6), ylim=c(51e6, 54e6))+
+  annotate("rect",xmin=chr5_start, xmax=chr5_end, ymin=-Inf, ymax=Inf, fill="purple", alpha=0.2)+
+  ggtitle("Chromosome 5")+
+  theme(axis.title.x = element_blank())
+
+
+
+#chr12, region 41162738 -41436885
+
+chr12 <- list(
+  c("NC_042546.1"),
+  c("CM037758.1")
+)
+
+chr12_start=41162738
+chr12_end=41436885
+
+dotplot(ali1.pm, label_seqs=TRUE, order_by="provided", ordering=chr12)+
+  theme_bw(base_size=25)+
+  coord_cartesian(xlim=c(40e6, 42e6), ylim=c(71e6, 74e6))
+
+p12 <- dotplot(ali1.pm, label_seqs=TRUE, order_by="provided", ordering=chr12)+
+  theme_bw(base_size=25)+
+  coord_cartesian(xlim=c(40e6, 42e6), ylim=c(71e6, 74e6))+
+  annotate("rect",xmin=chr12_start, xmax=chr12_end, ymin=-Inf, ymax=Inf, fill="purple", alpha=0.2)+
+  ggtitle("Chromosome 12")+
+  theme(axis.title.x = element_blank())
+
+
+
+#chr13, region 7145283 - 7672022
+
+chr13 <- list(
+  c("NC_042547.1"),
+  c("CM037762.1")
+)
+
+chr13_start=7145283
+chr13_end=7672022
+
+dotplot(ali1.pm, label_seqs=TRUE, order_by="provided", ordering=chr13)+
+  theme_bw(base_size=25)+
+  coord_cartesian(xlim=c(6.7e6, 8.7e6), ylim=c(57e6, 61e6))
+
+p13 <- dotplot(ali1.pm, label_seqs=TRUE, order_by="provided", ordering=chr13)+
+  theme_bw(base_size=25)+
+  coord_cartesian(xlim=c(6.7e6, 8.7e6), ylim=c(57e6, 61e6))+
+  annotate("rect",xmin=chr13_start, xmax=chr13_end, ymin=-Inf, ymax=Inf, fill="purple", alpha=0.2)+
+  ggtitle("Chromosome 13")+
+  theme(axis.title.x = element_blank())
+
+
+pdf("ogor_vs_oner_aln.pdf", width = 16, height = 12)
+p3+p5+p12+p13+plot_annotation(
+  title="Alignment against pink salmon (GCA_021184085.1)"
+)&
+  theme(plot.title = element_text(size=25, hjust=0.5))
+
+dev.off()
+
