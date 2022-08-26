@@ -1,7 +1,7 @@
 # lwf_LM_popgen
  
 # How to cite:
-Yue Shi, Jared J. Homola, Peter T. Euclide, Daniel A. Isermann, David C. Caroffino, Megan V. McPhee, Wesley A. Larson. High-density genomic data reveal fine-scale population structure and pronounced islands of adaptive divergence in lake whitefish (*Coregonus clupeaformis*) from Lake Michigan. *Evolutionary Applications* (2022).
+Yue Shi, Jared J. Homola, Peter T. Euclide, Daniel A. Isermann, David C. Caroffino, Megan V. McPhee, Wesley A. Larson. High-density genomic data reveal fine-scale population structure and pronounced islands of adaptive divergence in lake whitefish (*Coregonus clupeaformis*) from Lake Michigan. *Evolutionary Applications* (2022.08.26). https://doi.org/10.1111/eva.13475
 
 # Data
 
