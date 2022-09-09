@@ -11,7 +11,7 @@ Input and intermediate data for various analyses in the study.
 
 Demultiplexed initial RAD sequencing data (N=30) and Rapture data (N=951) used in this study are archived in the NCBI Sequence Read Archive with a BioProject ID, PRJNA687593. The Rapture data also included additional 175 individuals with mixed stock origins for a different study, and these 175 samples were sequenced and processed together with 951 baseline samples. Sample meta information along with sequence accession numbers for all samples can be found in Table S5. 
 
-A fasta file for the Rapture panel with 100K baited loci and a vcf file after filtering (829 individuals and 197,588 SNPs) are archived on DRYAD [https://doi.org/10.5061/dryad.r4xgxd2gq](https://doi.org/10.5061/dryad.r4xgxd2gq). PLINK files used in various analyses are also archived on DRYAD due to the file size limit of Github.
+A fasta file for the Rapture panel with 100K baited loci and a vcf file after filtering (829 individuals and 197,588 SNPs) are archived on DRYAD [(https://doi.org/10.5061/dryad.r4xgxd2gq)](https://doi.org/10.5061/dryad.r4xgxd2gq). PLINK files used in various analyses are also archived on DRYAD due to the file size limit of Github.
 
 # Scripts
 
